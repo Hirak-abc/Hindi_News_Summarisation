@@ -1,3 +1,3 @@
-# P10: Abstractive Summarisation of Hindi News
+# Hindi_News_Summarisation
 
-Team project using the XL-Sum Hindi dataset.
+A team-based Deep Learning project focused on developing an automated Hindi news summarisation system using the XL-Sum Hindi dataset.
