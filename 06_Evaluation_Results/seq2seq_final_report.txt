@@ -1,0 +1,57 @@
+HINDI NEWS SUMMARISATION
+SEQ2SEQ WITH ATTENTION — FINAL REPORT
+
+1. DATASET
+Dataset: XL-Sum Hindi
+Test samples: 8,847
+
+2. MODEL ARCHITECTURE
+Encoder: Bidirectional LSTM
+Decoder: LSTM
+Attention: Additive Attention
+Embedding dimension: 256
+Hidden size: 256
+Vocabulary size: 30,000
+Dropout: 0.2
+
+3. TRAINING CONFIGURATION
+Epochs: 10
+Batch size: 32
+Learning rate: 0.001
+Optimizer: Adam
+Teacher forcing: 0.5
+Maximum source length: 400
+Maximum target length: 100
+Random seed: 42
+
+4. ORIGINAL GREEDY DECODING
+ROUGE-1: 0.412989
+ROUGE-2: 0.169692
+ROUGE-L: 0.313133
+
+5. IMPROVED DECODING
+Strategy: Greedy decoding with repetition penalty
+Repetition penalty: 1.5
+Maximum generation length: 100
+
+ROUGE-1: 0.482220
+ROUGE-2: 0.203119
+ROUGE-L: 0.340372
+
+6. RELATIVE IMPROVEMENT
+ROUGE-1: 16.77%
+ROUGE-2: 19.70%
+ROUGE-L: 8.70%
+
+7. EVALUATION
+Evaluation dataset: Common test set
+Number of test examples: 8,847
+Tokenizer: Unicode-aware Hindi tokenizer
+Training was performed once; the improved results were
+obtained by changing inference-time decoding.
+
+8. FINAL PREDICTION FILE
+05_Predictions/seq2seq_predictions_penalty_1.5.csv
+
+9. EVALUATION FILE
+06_Evaluation_Results/seq2seq_penalty_1.5_rouge.csv

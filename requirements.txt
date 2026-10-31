@@ -1,9 +1,0 @@
-datasets
-transformers
-sentencepiece
-torch
-rouge-score
-pandas
-numpy
-matplotlib
-networkx
