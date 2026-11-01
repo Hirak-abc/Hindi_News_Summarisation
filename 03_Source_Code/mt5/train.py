@@ -27,6 +27,19 @@ MAX_SOURCE_LEN = 400   # same as Seq2Seq source limit
 MAX_TARGET_LEN = 100   # same as Seq2Seq target limit
 SETTINGS_PATH = "04_Models/mt5_small/training_settings.json"
 
+XLSUM_REVISION = "651dcf16e996d411b12f0bb7b8fc671788f24193"
+XLSUM_HINDI_BASE_URL = (
+    "https://huggingface.co/datasets/csebuetnlp/xlsum/resolve/"
+    f"{XLSUM_REVISION}/hindi/"
+)
+XLSUM_HINDI_FILES = {
+    "train": [
+        f"{XLSUM_HINDI_BASE_URL}xlsum-train-00000-of-00002.parquet",
+        f"{XLSUM_HINDI_BASE_URL}xlsum-train-00001-of-00002.parquet",
+    ],
+    "validation": f"{XLSUM_HINDI_BASE_URL}xlsum-validation.parquet",
+}
+
 
 def keep_non_empty(row):
     return bool(row["text"] and row["text"].strip()) and bool(
@@ -51,7 +64,7 @@ def main():
 
     set_seed(SEED)
 
-    raw = load_dataset("csebuetnlp/xlsum", "hindi")
+    raw = load_dataset("parquet", data_files=XLSUM_HINDI_FILES)
     train = raw["train"].filter(keep_non_empty)
     valid = raw["validation"].filter(keep_non_empty)
     print(f"Rows after filtering: train={len(train)}, validation={len(valid)}")
