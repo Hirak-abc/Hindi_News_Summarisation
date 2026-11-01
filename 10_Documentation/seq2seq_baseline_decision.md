@@ -1,6 +1,6 @@
 ﻿# Seq2Seq baseline decision
 
-Agreed by Hirak (Seq2Seq owner) on DATE_HERE. Use these numbers as the Seq2Seq baseline for the comparison.
+Agreed by Hirak (Seq2Seq owner) on 1 November 2026. Use these numbers as the Seq2Seq baseline for the comparison.
 
 ## Comparable results (full 8,847-example test set, same Unicode-aware scorer)
 
