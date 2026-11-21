@@ -1,0 +1,19 @@
+{
+  "model": "google/mt5-small",
+  "dataset": "csebuetnlp/xlsum (hindi)",
+  "smoke_run": false,
+  "train_rows": 70777,
+  "validation_rows": 8847,
+  "epochs": 2,
+  "batch_size": 8,
+  "learning_rate": 0.0005,
+  "optimizer": "AdamW (Trainer default)",
+  "weight_decay": 0.01,
+  "max_source_length": 400,
+  "max_target_length": 100,
+  "seed": 42,
+  "precision": "fp32",
+  "gpu": "Tesla T4",
+  "train_minutes": 148.3,
+  "checkpoint_location": "not retained"
+}
