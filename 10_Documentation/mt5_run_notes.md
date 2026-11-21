@@ -34,3 +34,10 @@
 - Learning rate chosen as a starting value, not tuned.
 - Hallucination and faithfulness not yet evaluated for mT5.
 - The Kaggle session that trained the model did not keep its checkpoint, so the model cannot be re-run from saved weights; retraining is needed to reproduce it.
+
+## Model checkpoint
+- Hugging Face Hub: https://huggingface.co/Anshugh/mt5-small-hindi-xlsum
+- Retrained on Colab (Tesla T4), 2 epochs, batch size 8, learning rate 5e-4, seed 42.
+- Training time: 169.2 minutes.
+- The original Kaggle checkpoint was not retained; this checkpoint comes from the Colab retrain.
+- Reported ROUGE scores are from the original Kaggle run. Re-scoring the retrained model is pending.

@@ -3,6 +3,8 @@
 Source: Kaggle run output, copied from the notebook output after training.
 This is NOT the original train_log.txt, which was not saved.
 
+Note: the step numbers below were recorded at batch size 16, but the Kaggle run used batch size 8 (the script default, no --batch_size flag in the command). The step numbers do not match the batch size 8 settings. The loss values come from the original Kaggle run. The retrained Colab run (batch size 8, 17,696 total steps) is documented in 10_Documentation/mt5_run_notes.md.
+
 | Step | Epoch | Training loss | Learning rate |
 |---|---|---|---|
 | 50 | 0.01 | 12.2009 | 4.97e-4 |
