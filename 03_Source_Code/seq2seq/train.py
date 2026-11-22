@@ -61,6 +61,7 @@ def tokenize(text: str) -> list[str]:
 
 
 def encode(text: str, vocabulary: dict[str, int], max_length: int) -> list[int]:
+    # Convert text to vocabulary IDs, add boundaries, and enforce a length cap.
     ids = [vocabulary["<bos>"]]
     ids.extend(vocabulary.get(token, vocabulary["<unk>"]) for token in tokenize(text))
     ids.append(vocabulary["<eos>"])
@@ -68,6 +69,8 @@ def encode(text: str, vocabulary: dict[str, int], max_length: int) -> list[int]:
 
 
 class SummaryDataset(Dataset[tuple[list[int], list[int]]]):
+    # Expose tokenized article-summary pairs to PyTorch data loaders.
+
     def __init__(
         self,
         rows: Sequence[dict[str, Any]],
@@ -75,15 +78,18 @@ class SummaryDataset(Dataset[tuple[list[int], list[int]]]):
         max_source_length: int,
         max_target_length: int,
     ) -> None:
+        # Store rows, vocabulary, and source/target token limits.
         self.rows = rows
         self.vocabulary = vocabulary
         self.max_source_length = max_source_length
         self.max_target_length = max_target_length
 
     def __len__(self) -> int:
+        # Return the number of retained article-summary pairs.
         return len(self.rows)
 
     def __getitem__(self, index: int) -> tuple[list[int], list[int]]:
+        # Encode one source article and its reference summary.
         row = self.rows[index]
         if not str(row.get("text", "")).strip() or not str(row.get("summary", "")).strip():
             raise ValueError(f"Empty article-summary pair at dataset row {index}.")
@@ -96,6 +102,7 @@ class SummaryDataset(Dataset[tuple[list[int], list[int]]]):
 def collate_batch(
     batch: list[tuple[list[int], list[int]]], pad_id: int
 ) -> tuple[torch.Tensor, torch.Tensor]:
+    # Pad variable-length source and target sequences into batch tensors.
     source_max = max(len(source) for source, _ in batch)
     target_max = max(len(target) for _, target in batch)
     sources = [source + [pad_id] * (source_max - len(source)) for source, _ in batch]
@@ -106,6 +113,7 @@ def collate_batch(
 def build_vocabulary(
     rows: Sequence[dict[str, Any]], max_size: int, min_frequency: int
 ) -> dict[str, int]:
+    # Build a frequency-ranked vocabulary while reserving special token IDs.
     frequencies: dict[str, int] = {}
     for row in rows:
         for token in tokenize(f"{row['text']} {row['summary']}"):
@@ -121,12 +129,14 @@ def build_vocabulary(
 
 
 def limit_rows(rows: Any, limit: int | None) -> Any:
+    # Optionally select the first `limit` examples from a dataset split.
     if limit is None:
         return rows
     return rows.select(range(min(limit, len(rows))))
 
 
 def is_valid_summary_pair(row: dict[str, Any]) -> bool:
+    # Check that a dataset row contains both a non-empty article and summary.
     return bool(str(row.get("text") or "").strip()) and bool(
         str(row.get("summary") or "").strip()
     )
@@ -156,6 +166,7 @@ def evaluate_loss(
     device: torch.device,
     pad_id: int,
 ) -> float:
+    # Compute validation cross-entropy averaged over non-padding target tokens.
     model.eval()
     total_loss = 0.0
     total_tokens = 0
@@ -174,6 +185,7 @@ def evaluate_loss(
 
 
 def train(args: argparse.Namespace) -> Path:
+    # Train the attention model and save the checkpoint with best validation loss.
     if args.max_source_length < 2 or args.max_target_length < 2:
         raise ValueError("Maximum source and target lengths must be at least 2.")
     if not 0.0 <= args.teacher_forcing <= 1.0:
@@ -186,6 +198,7 @@ def train(args: argparse.Namespace) -> Path:
     device = torch.device(args.device or ("cuda" if torch.cuda.is_available() else "cpu"))
     print(f"Training on {device}")
 
+    # Load and clean both splits before building the vocabulary from training data.
     dataset = load_xlsum_hindi()
     train_rows = limit_rows(
         filter_valid_summary_pairs(dataset["train"], "train"),
@@ -227,6 +240,7 @@ def train(args: argparse.Namespace) -> Path:
     history_path.write_text("epoch,train_loss,validation_loss\n", encoding="utf-8")
     best_loss = float("inf")
 
+    # Track token-weighted losses and retain the checkpoint that generalizes best.
     for epoch in range(1, args.epochs + 1):
         model.train()
         running_loss = 0.0
@@ -281,6 +295,7 @@ def train(args: argparse.Namespace) -> Path:
 
 
 def parse_args() -> argparse.Namespace:
+    # Parse training hyperparameters and input-size controls from the CLI.
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--checkpoint-dir", type=Path, default=DEFAULT_CHECKPOINT_DIR)
     parser.add_argument("--epochs", type=int, default=10)

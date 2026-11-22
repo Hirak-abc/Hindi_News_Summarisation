@@ -46,6 +46,7 @@ class HindiTokenizer:
     """Unicode-aware tokenizer for Hindi ROUGE evaluation."""
 
     def tokenize(self, text: str) -> list[str]:
+        # Keep Devanagari combining marks attached to their base word.
         text = unicodedata.normalize("NFC", str(text).lower())
         tokens = []
         current = []
@@ -67,6 +68,7 @@ class HindiTokenizer:
 
 
 def decode(ids: list[int], inverse_vocabulary: list[str]) -> str:
+    # Convert generated token IDs to readable text and clean punctuation spacing.
     tokens = []
 
     for token_id in ids:
@@ -217,7 +219,7 @@ def load_test_rows(
     path: Path,
     limit: int | None,
 ) -> pd.DataFrame:
-
+    # Load a validated test CSV and optionally restrict it for a smoke run.
     if not path.is_file() or path.stat().st_size == 0:
         raise FileNotFoundError(f"Test dataset not found: {path}")
 
@@ -244,7 +246,7 @@ def load_test_rows(
 
 
 def predict(args: argparse.Namespace) -> Path:
-
+    # Load the checkpoint, generate summaries, score them, and save the outputs.
     # Load training and inference settings.
     with open(args.settings, "r", encoding="utf-8") as f:
         settings = json.load(f)
@@ -292,6 +294,7 @@ def predict(args: argparse.Namespace) -> Path:
     if not args.checkpoint.is_file():
         raise FileNotFoundError(f"Checkpoint not found: {args.checkpoint}")
 
+    # Load the saved vocabulary and weights onto the selected inference device.
     checkpoint: dict[str, Any] = torch.load(
         args.checkpoint,
         map_location=device,
@@ -359,6 +362,7 @@ def predict(args: argparse.Namespace) -> Path:
             vocabulary["<pad>"],
         )
 
+        # Generate each batch with the requested repetition and n-gram constraints.
         generated = generate_with_penalty(
             model=model,
             sources=sources.to(device),
@@ -455,7 +459,7 @@ def predict(args: argparse.Namespace) -> Path:
 
 
 def parse_args() -> argparse.Namespace:
-
+    # Parse file paths, decoding controls, batch size, and device options.
     parser = argparse.ArgumentParser(description=__doc__)
 
     parser.add_argument(

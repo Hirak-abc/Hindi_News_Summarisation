@@ -20,6 +20,7 @@ class Seq2SeqAttention(nn.Module):
         pad_id: int,
         dropout: float = 0.2,
     ) -> None:
+        # Create embeddings, bidirectional encoder, attention, and decoder layers.
         super().__init__()
         self.pad_id = pad_id
         self.embedding = nn.Embedding(vocab_size, embedding_dim, padding_idx=pad_id)
@@ -43,6 +44,7 @@ class Seq2SeqAttention(nn.Module):
         self.output = nn.Linear(hidden_size * 3, vocab_size)
 
     def encode(self, source: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+        # Encode padded source tokens and initialize the decoder state.
         mask = source.ne(self.pad_id)
         embedded = self.dropout(self.embedding(source))
         lengths = mask.sum(dim=1).cpu()
@@ -67,6 +69,8 @@ class Seq2SeqAttention(nn.Module):
         hidden: torch.Tensor,
         cell: torch.Tensor,
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        # Attend to encoder states and predict the next-token logits.
+        # Mask padding before softmax so attention only uses real source tokens.
         query = self.attention_decoder(hidden[-1]).unsqueeze(1)
         energy = self.attention_score(
             torch.tanh(self.attention_encoder(encoded) + query)
@@ -96,6 +100,7 @@ class Seq2SeqAttention(nn.Module):
                 token.unsqueeze(1), encoded, source_mask, hidden, cell
             )
             outputs.append(logits)
+            # Teacher forcing feeds the gold token; otherwise feed this step's prediction.
             use_teacher = random.random() < teacher_forcing_ratio
             token = target[:, step] if use_teacher else logits.argmax(dim=-1)
         return torch.stack(outputs, dim=1)

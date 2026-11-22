@@ -28,6 +28,7 @@ class HindiTokenizer:
     """Unicode-aware tokenizer for Hindi ROUGE evaluation (same as seq2seq/predict.py)."""
 
     def tokenize(self, text: str) -> list[str]:
+        # Group Unicode letters, marks, and numbers without splitting Hindi glyphs.
         text = unicodedata.normalize("NFC", str(text).lower())
         tokens = []
         current = []
@@ -46,6 +47,7 @@ class HindiTokenizer:
 
 
 def main():
+    # Generate mT5 summaries and report Hindi-aware ROUGE scores.
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_dir", required=True)
     parser.add_argument("--output", default="05_Predictions/mt5_predictions.csv")
@@ -61,11 +63,13 @@ def main():
     print(f"Test rows: {len(test)}")
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
+    # Load the fine-tuned model and its matching tokenizer from the same directory.
     tokenizer = AutoTokenizer.from_pretrained(args.model_dir)
     model = AutoModelForSeq2SeqLM.from_pretrained(args.model_dir).to(device).eval()
 
     articles = test["article"].fillna("").astype(str).tolist()
     predictions = []
+    # Disable gradient tracking because this path only performs inference.
     with torch.no_grad():
         for start in range(0, len(articles), args.batch_size):
             batch = articles[start:start + args.batch_size]

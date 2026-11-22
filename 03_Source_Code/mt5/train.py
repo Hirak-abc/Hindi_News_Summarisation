@@ -42,12 +42,14 @@ XLSUM_HINDI_FILES = {
 
 
 def keep_non_empty(row):
+    # Keep only training examples with both article text and reference summary.
     return bool(row["text"] and row["text"].strip()) and bool(
         row["summary"] and row["summary"].strip()
     )
 
 
 def main():
+    # Fine-tune mT5 on Hindi XL-Sum and save model, tokenizer, and run settings.
     parser = argparse.ArgumentParser()
     parser.add_argument("--smoke", action="store_true",
                         help="500 train rows, 200 validation rows, 1 epoch")
@@ -64,6 +66,7 @@ def main():
 
     set_seed(SEED)
 
+    # Read the pinned XL-Sum Parquet revision so later runs use the same source data.
     raw = load_dataset("parquet", data_files=XLSUM_HINDI_FILES)
     train = raw["train"].filter(keep_non_empty)
     valid = raw["validation"].filter(keep_non_empty)
@@ -77,6 +80,7 @@ def main():
     model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_NAME)
 
     def preprocess(batch):
+        # Tokenize source articles and target summaries for sequence-to-sequence training.
         inputs = tokenizer(batch["text"], max_length=MAX_SOURCE_LEN, truncation=True)
         labels = tokenizer(text_target=batch["summary"],
                            max_length=MAX_TARGET_LEN, truncation=True)
@@ -102,6 +106,7 @@ def main():
         report_to="none",
     )
 
+    # Hugging Face's collator dynamically pads batches and the Trainer handles evaluation.
     trainer = Seq2SeqTrainer(
         model=model,
         args=training_args,
@@ -111,6 +116,7 @@ def main():
     )
 
     # Resume after a disconnect if a checkpoint already exists
+    # Resume from the latest saved checkpoint when an interrupted run is continued.
     last_checkpoint = None
     if Path(args.output_dir).exists():
         last_checkpoint = get_last_checkpoint(args.output_dir)
