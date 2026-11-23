@@ -1,11 +1,14 @@
 # Prompt definitions for Hindi news summarization.
+# This comment identifies the purpose of the module.
 
 SYSTEM_PROMPT = """आप एक सटीक हिंदी समाचार संपादक हैं।
 केवल दिए गए समाचार लेख की जानकारी का उपयोग करें।
 अपने जवाब में अनुमान, बाहरी तथ्य, नाम, संख्या या घटना न जोड़ें।
 संक्षिप्त, तथ्यनिष्ठ और प्रवाहपूर्ण हिंदी सारांश दें।"""
+# This triple-quoted value supplies system instructions for every Gemini request.
 
 # Reusable concise prompt for prompt-development experiments.
+# This prompt is available by the "baseline" name.
 DEFAULT_PROMPT = """निम्नलिखित हिंदी समाचार लेख का अधिकतम 100 शब्दों में सारांश लिखिए।
 सारांश में केवल लेख में मौजूद मुख्य तथ्य और घटनाएं शामिल करें।
 परिचय, व्याख्या, टिप्पणी या अतिरिक्त जानकारी न दें।
@@ -14,10 +17,13 @@ DEFAULT_PROMPT = """निम्नलिखित हिंदी समाच�
 {article}
 
 हिंदी सारांश:"""
+# The article placeholder is replaced before sending the request.
 
 # Named prompt variants make it possible to choose and log a prompt consistently.
+# This dictionary maps experiment names to prompt templates.
 EXPERIMENTAL_PROMPTS = {
     "baseline": DEFAULT_PROMPT,
+    # Reuse the default prompt for the baseline experiment.
     "faithful": """नीचे दिए हिंदी समाचार लेख को पढ़कर 3 से 5 वाक्यों का हिंदी सारांश लिखिए।
 केवल स्पष्ट रूप से उल्लेखित लोगों, स्थानों, तारीखों और घटनाओं का उपयोग करें।
 लेख में न दी गई कोई जानकारी न जोड़ें।
