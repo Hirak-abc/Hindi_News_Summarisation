@@ -1,5 +1,0 @@
-model,total_reviewed,hallucinated,hallucination_rate
-LLM,100,1,0.01
-Seq2Seq,100,100,1.0
-TextRank,100,0,0.0
-mT5,100,100,1.0
